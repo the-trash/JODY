@@ -210,13 +210,15 @@ if current_user
     end
   end
   
-  json.invoke do |exec|
-    exec.sidebar_initialize
-    exec.user_info_initialize
+  json.initializers do |run|
+    run.sidebar_initialize
+    run.user_info_initialize
   end
 
 else
 
+  json.errors @user.errors
+  
   json.flash do
     json.error t ".login_failure"
   end
