@@ -38,12 +38,14 @@
 Вот так может выглядеть форма входа в Rails приложении
 
 ```ruby
-= form_for(User.new, url: new_user_session_path, remote: true, data: { type: :script }, html: { id: :login_form } ) do |f|
+= form_for(User.new, url: new_session_path, remote: true, data: { type: :script }, html: { id: :login_form } ) do |f|
   = f.text_field :email
   = f.password_field :password
 ```
 
 Вот так может выглядеть метод контроллера Session
+
+**session_controller.rb**
 
 ```ruby
 def create
@@ -58,21 +60,33 @@ end
 
 и примерно вот так будет выглядеть один из шаблонов:
 
-**sign_in_success.html.erb**
+**sign_in_success.js.erb**
 
 ```erb
-$("#sidebar").append("<%= render partial: "user_accaunt_block" %>")
-App.sidebar_initialize()
+$("#sidebar").append("<%= render partial: "user_accaunt_block" %>");
+App.sidebar_initialize();
 
-$("#login_block").empty().append("<%= render partial: "user_info" %>")
-App.user_info_initialize()
+$("#login_block").empty().append("<%= render partial: "user_info" %>");
+App.user_info_initialize();
 
-AppNotifier.alert("<%= t ".login_success" %>")
+AppNotifier.alert("<%= t ".login_success" %>");
 ```
 
-Такой вариант решения задачи более чем распространен и используется во многих проектах.
+Такой вариант решения задачи довольно распространен и используется во многих проектах.
 
-Однако многие могут заметить, что мы начали писать код стороны клиента на стороне сервера. И как минимум это грозит нам тем, что наш JQuery код в скором времени займет не только положенное ему место в каталоге **app/assets/javascript**, но и половину нашего основного приложения, что не может не заставить задуматься о других вариантах решения задачи.
+Однако многие могут заметить, что мы начали писать код стороны клиента на стороне сервера.
+
+Подобный подход грозит нам тем, что скоро наш JavaScript + JQuery код займет в шаблонах на сервере довольно много места, хотя он должен быть сосредоточен только одном месте - **app/assets/javascript**.
+
+Кроме того, есть вероятность, что шаблон может вам придти к вам на поддержку и в таком виде:
+
+```erb
+$("#sidebar").append("<%= render partial: "user_accaunt_block" %>"); AppNotifier.alert("<%= t ".login_success" %>");
+App.sidebar_initialize(); $("#login_block").empty().append("<%= render partial: "user_info" %>");
+App.user_info_initialize();
+```
+
+Этот код я оставлю Без комментариев.
 
 ### Вариант 2 - JODY
 
