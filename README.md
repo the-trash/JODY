@@ -195,23 +195,32 @@ end
 **create.json.jbuilder**
 ```ruby
 if current_user
+
   json.flash do
     json.info t '.login_success'
   end
 
   json.html_partials do |html|
-    html.sidebar     render partial: "user_accaunt_block.html"
-    html.login_block render partial: "user_info.html"
+    html.replace do |div|
+      div.login_block render(partial: "user_info.html")
+    end
+    
+    html.append do |div|
+      div.sidebar render(partial: "user_accaunt_block.html")
+    end
   end
   
-  json.invoke do |function|
-    function.sidebar_initialize
-    function.user_info_initialize
+  json.invoke do |exec|
+    exec.sidebar_initialize
+    exec.user_info_initialize
   end
+
 else
+
   json.flash do
     json.error t ".login_failure"
   end
+
 end
 ```
 
