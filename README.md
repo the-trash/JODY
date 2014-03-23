@@ -292,7 +292,7 @@ CreateDigital LLC specializes in development of complex high load web services w
 
 Please, let me know about your opinion or practice
 
-[Discussion](https://github.com/the-teacher/JODY/issues/1)
+[DISCUSSION ABOUT JODY](https://github.com/the-teacher/JODY/issues/1)
 
 #### Acknowledgements
 
