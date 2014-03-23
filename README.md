@@ -288,6 +288,12 @@ Ilya Zykin - rails developer and team lead at [CreateDigital LLC](http://created
 
 CreateDigital LLC specializes in development of complex high load web services with a real value, which benefit the proprietors and bring joy to the users.
 
+### Discussion about JODY
+
+Please, let me know about your opinion or practice
+
+[Discussion](https://github.com/the-teacher/JODY/issues/1)
+
 #### Acknowledgements
 
 [@milushov](https://github.com/milushov) - Thanks to Roman, whose code helped finally formulating the idea
