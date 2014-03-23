@@ -236,7 +236,7 @@ You can notice more code in the view in comparison to the source but don't forge
 
 ### Yet another example
 
-Ниже я приведу пример кода, который формирует на сервере данные для модального окна и инициализирует элементы шаблона, когда они будут отрисованы на странице:
+Your JSON response can looks like this:
 
 ```ruby
 json.modal do |modal|
@@ -251,7 +251,7 @@ json.window do |window|
 end
 ```
 
-This JSON response can be the intermediary for instructions JODY that would do following things:
+This JSON response can be the holder of instructions for JODY that would do following things:
 
 1. create a modal window to edit the post
 2. Initialize the post editing form after HTML inserting into DOM
