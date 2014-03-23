@@ -26,7 +26,7 @@ On the rich-content website we'll try to implement the following task:
 1. User login should be executed without reload of the page
 2. In case of success or error a corresponding notification pop-ups
 3. In case of success a shopping-cart widget shows up on a sidebar
-4. In case of success login form is replaced by the user info widget (???)
+4. In case of success login form is replaced by the user info widget
 
 
 ### Variant A - "classic"
