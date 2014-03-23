@@ -286,7 +286,7 @@ end
 
 Пожалуйста, дайте мне знать во вашем мнении или практиках
 
-:octocat: [ОБСУЖДЕНИЕ JODY](https://github.com/the-teacher/JODY/issues/1)
+:octocat: &nbsp; [ОБСУЖДЕНИЕ JODY](https://github.com/the-teacher/JODY/issues/1)
 
 #### Об авторе
 
