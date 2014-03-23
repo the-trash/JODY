@@ -59,7 +59,7 @@ def create
 end
 ```
 
-и примерно вот так будет выглядеть один из шаблонов:
+and this is one of the templates:
 
 **sign_in_success.js.erb**
 ```erb
@@ -79,7 +79,7 @@ However we understand that we'd started writing client-side code on the server s
 
 Such approach will lead us to Javascript & JQuery code taking up a lot of space in server templates while it has to be concentrated in **app/assets/javascript**.
 
-And there is a possibility that you'd find yourself supporting a code like that one:
+Unfortunately, in real world you can to get to supporting following code
 
 ```erb
 $("#sidebar").append("<%= render partial: "shopping_cart_block" %>"); AppNotifier.alert("<%= t ".login_success" %>");
@@ -171,11 +171,10 @@ $('#login_form').on 'ajax:success', (data, status, xhr) ->
 
 ### JBuilder for JODY
 
-На стороне сервера JODY обеспечивается JBuilder'ом. Он используется для того, что бы аккуратно формировать ответы сервера с заданной структурой.
+Let's get back to the previous task and solve it using the power of JODY.
 
-Вернемся начальной задаче и посмотрим, как бы она могла быть решена с использованием JODY
+Here is the login form, which should to get JSON from server. Notice we've changed the expected server response type to ```type: :json```
 
-Вот так может выглядеть форма входа для JODY. Здесь мы изменили тип ожидаемого от сервера ответа ```type: :json```
 
 ```ruby
 = form_for(User.new, url: new_user_session_path, remote: true, data: { type: :json }) do |f|
@@ -183,7 +182,7 @@ $('#login_form').on 'ajax:success', (data, status, xhr) ->
   = f.password_field :password
 ```
 
-Вот так может выглядеть метод контроллера Session
+And take a look on the Session controller:
 
 ```ruby
 def create
@@ -193,7 +192,7 @@ def create
 end
 ```
 
-и примерно вот так будет выглядеть jbuilder шаблон:
+and your jbuilder template will look like that:
 
 **create.json.jbuilder**
 ```ruby
@@ -209,7 +208,7 @@ if current_user
     end
     
     html.append do |div|
-      div.sidebar render(partial: "user_accaunt_block.html")
+      div.sidebar render(partial: "shopping_cart_block.html")
     end
   end
   
@@ -229,13 +228,13 @@ else
 end
 ```
 
-Глядя на этот простой пример вы можете отметить, что количество кода вьюшки увеличилось по сравнению с исходным, но, оценивая полученный результат не забудьте отметить и следующие моменты
+You can notice more code in the view in comparison to the source but don't forget the following 
 
-1. backend разработчик полностью отделен от особенностей реализации forntend части, и вероятно большинство задач не потребует от него дополнительных навыков
-2. Благодаря соглашениям вы сократите кол-во JS кода на клиентской стороне
-3. Вы очистили свои вьюшки от JS вставок и существенно улучшили поддерживаемость своей системы
+1. Backend developer do not interfere in the front-end and no additional skills are required of him
+2. You reduce JS on the client side thanks to the conventions
+3. You've purified your views from JS and improved your system's sustainability
 
-### Еще один пример
+### Yet another example
 
 Ниже я приведу пример кода, который формирует на сервере данные для модального окна и инициализирует элементы шаблона, когда они будут отрисованы на странице:
 
@@ -252,42 +251,42 @@ json.window do |window|
 end
 ```
 
-Подобный JSON ответ может быть инструкцией JODY посреднику для того, что бы сформировать
+This JSON response can be the intermediary for instructions JODY that would do following things:
 
-1. сформировать модальное окно для редактирования поста
-2. Проинициализировать форму редактирования поста после построения HTML
-3. Изменить заголовок окна браузера
-4. Установить текущи URL браузера. 
+1. create a modal window to edit the post
+2. Initialize the post editing form after HTML inserting into DOM
+3. Change a title of browser's window
+4. Set the current browser URL
 
-### Но ведь идея не нова?
+### So what's so new?
 
-Да, идея возвращения фрагментов вида на сторону клиента с помощью JSON структур не нова и вы можете встретить вопросы на эту тему на stackowerflow, например, [тут](http://stackoverflow.com/questions/13713250/render-to-string-partial-format-error-in-controller)
+Yes, the idea of returning partials to the client side with JSON is not novel and you can refer to discussions like  [this](http://stackoverflow.com/questions/13713250/render-to-string-partial-format-error-in-controller) on stackowerflow
 
-Мы лишь предлагаем использовать эту возможность на чуть более продвинутом уровне, что бы с помощью соглашений и небольшого количества кода существенно улучшить поддерживаемые системы и внести в них долю порядка.
+We just suggest using this technique on the advanced level to improve and organize sustainable systems with conventions and few lines of code.
 
-### Могу ли я использовать технику JODY не для Rails?
+### Am I limited to Rails if I want to use JODY?
 
-Да, конечно! Вероятно вам придется приложить чуть больше сил, что бы обеспечить отправку AJAX запросов на сервер, но трудностей у вас возникнуть не должно.
+Well of course not! There can be more of challenge to setup sending of AJAX requests to server but it's not that big of a deal.
 
-Главные ожидания от систем которые хотят использовать JODY следующие
+There are following basic requirements if you want to use JODY:
 
-1. Шаблонизация производится в основном на серверной стороне
-2. Сервер возвращает ответы в виде JSON данных со структурой подчиненной вашим корпоративным соглашениям
+1. System mostly uses server side rendering
+2. Server responses with structured JSON data which accords to your corporate conventions
 
-Все что вам останется - выделить наиболее рутинные операции на клиентской части приложения и автоматизировать их выполнение с помощью JODY посредника 
 
-### Есть ли у JODY более точная спецификация?
+All you have to do is pick out the most routine operations on client side and simplify them with JODY handler.
 
-Написание JODY посредника - задача довольно простая. Формирование соглашений - процесс требующий вовлечения большого количества людей и обзора хотя бы нескольких удачных практик на крупных проектах и выделение из них рационального зерна.
+### Are there thorough specifications for JODY?
 
-На данный момент мы не готовы дать сообществу готовый рецепт и предлагаем вам при необходимости придти к своим соглашениям. Наверняка это будет увлекательным процессом для всей команды.
+Writing a JODY handler is an easy task. Agreeing on conventions is a process requiring participation of a lot of people. You also need to review and breakdown several successful practices implemented in major projects.
 
-#### Об авторе
+We're not ready to give the complete recipe to the community at the moment and offer you to come to your own conventions. We're sure it's gonna be a fun task for a team.
 
-Илья Зыкин -  rails разработчик и teamlead в компании [CreateDigital.me](http://createdigital.me). Илья в команде с талантливыми разработчиками компании CreateDigital старается найти интересные практики и решения для улучшения качеств создаваемых продуктов и упрощения процесса разработки. Основное увлечение Ильи - системы электронных публикаций и социально-ориентированные сервисы.
+Ilya Zykin - rails developer and team lead at [CreateDigital LLC](http://createdigital.me). Ilya and his team of talented developers look for interesting practices and solutions which improve quality of the products and simplify the development process. Ilya’s area of interest includes e-publishing systems and social services.
 
-Компания СreateDigital специализируется на создании сложных, комплексных, массовых и высоконагруженных веб-сервисов, которые несут в себе реальную ценность, приносят дивиденды своим владельцам и доставляют пользу и радость людям.
+CreateDigital LLC specializes in development of complex high load web services with a real value, which benefit the proprietors and bring joy to the users.
 
-#### Благодарности
+#### Acknowledgements
 
-[@milushov](https://github.com/milushov) - Спасибо Роману, фрагменты кода которого дали повод довести описанную идею до логического завершения
+[@milushov](https://github.com/milushov) - Thanks to Roman, whose code helped finally formulating the idea
+[@bel9ev](https://github.com/bel9ev) - for help with En version and awesome project management
