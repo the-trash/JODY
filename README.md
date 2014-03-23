@@ -282,6 +282,8 @@ Writing a JODY handler is an easy task. Agreeing on conventions is a process req
 
 We're not ready to give the complete recipe to the community at the moment and offer you to come to your own conventions. We're sure it's gonna be a fun task for a team.
 
+### About autor
+
 Ilya Zykin - rails developer and team lead at [CreateDigital LLC](http://createdigital.me). Ilya and his team of talented developers look for interesting practices and solutions which improve quality of the products and simplify the development process. Ilya’s area of interest includes e-publishing systems and social services.
 
 CreateDigital LLC specializes in development of complex high load web services with a real value, which benefit the proprietors and bring joy to the users.
