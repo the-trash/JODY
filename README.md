@@ -2,40 +2,44 @@
 
 Многие web приложения отлично работают с традиционным способом формирования статичных страниц. Суть этого простого процесса заключается в следующем:
 
-1. пользователь нажимает на ссылку
-2. запрос уходит на сервер
-3. сервер обрабатывает запрос и формирует страницу
-4. страница отправляется клиенту
-5. браузер перерисовывает страницу
+Many web applications work perfectly well rendering static pages the traditional way. Its principles are quite simple:
 
-По этой схеме работает большинство приложений в сети.
 
-Однако нам все чаще приходится сталкиваться с приложениями в которых контент одной страницы достаточно богат. На странице могут быть фотографии, видео, интерактивные элементы.
+1. User clicks a link
+2. Request is sent to server
+3. Server processes the request and builds a page
+4. Page is sent to the client
+5. Browser redraw the page
 
-В таких приложениях каждая загрузка страницы становится очень дорогим удовольствием и мы все чаще ищем способ сократить количество перезагрузок страницы и подгружать на страницу только новые элементы
+Most of the web apps work like that.
 
-Такими элементами могут небольшие фрагменты страницы, модальные окна, сообщения об ошибках, уведомления, блоки дополнительного контента.
+Still applications with rich-content web-pages get more and more common. On one page there are photos and carousels, videos, interactive and embedded elements.
 
-Ниже мы рассмотрим ситуацию для системы, которая использует в основном шаблонизацию на сервере т.е. использует JADE, HAML или SLIM для формирования вьюшек.
+In this kind of apps processing of the page is rather resource consuming and we look for the ideas to reduce frequent reloads. One of the ways is trying to add new elements to the existing page.
 
-**Пример распространенной задачи**
+These elements include small fragments of the page, modal windows and pop-ups, different notifications and additional parts of the content.
 
-На сайте с большим кол-вом "тяжелого" контента планируется реализовать следующее:
+Let's analyze behavior of the system which uses server-side templating with Jade, HAML or SLIM for building views.
 
-1. Вход пользователя в систему должен быть выполнен без перезагрузки страницы
-2. В случае успеха или ошибки должно появится уведомление
-3. В случае успеха в боковой панели должен появится блок с корзиной пользователя
-4. В случае успеха форма входа должна быть заменена на блок с информацией о пользователе
+**An example of common task**
 
-### Вариант 1 - "классический"
+On the rich-content website we'll try to implement the following task:
 
-Мы рассмотрим вариант решения подобной задачи для Rails приложения, хотя конкретный стек технологий не играет здесь особой роли
+1. User login should be executed without reload of the page
+2. In case of success or error a corresponding notification pop-ups
+3. In case of success a shopping-cart widget shows up on a sidebar
+4. In case of success login form is replaced by the user info widget (???)
 
-Для решения задачи программист мог бы определить форму входа, как форму посылающую AJAX запрос ```remote: true```
 
-В качестве ответа мы (вероятно) захотели бы получить с сервера управляющий JS код. Для этого в качестве типа ответа пришедшего с сервера мы бы указали ```data: { type: :script } ```
+### Variant A - "classic"
 
-Вот так может выглядеть форма входа в Rails приложении
+We'll analyze a technique of solving such a task in Rails application, although exact technology stack is not relevant.
+
+Developer can define login form as a form which sends AJAX request ```remote: true```
+
+We suppose to get JS script which should be executed on client side. We achieve that by specifying ```data: { type: :script } ``` as a response type.
+
+This is how login form in Rails app looks like
 
 ```ruby
 = form_for(User.new, url: new_session_path, remote: true, data: { type: :script }, html: { id: :login_form } ) do |f|
@@ -43,7 +47,7 @@
   = f.password_field :password
 ```
 
-Вот так может выглядеть метод контроллера Session
+Here is the method of Session controller
 
 **session_controller.rb**
 ```ruby
@@ -61,7 +65,7 @@ end
 
 **sign_in_success.js.erb**
 ```erb
-$("#sidebar").append("<%= render partial: "user_accaunt_block" %>");
+$("#sidebar").append("<%= render partial: "shopping_cart_block" %>");
 App.sidebar_initialize();
 
 $("#login_block").empty().append("<%= render partial: "user_info" %>");
@@ -70,57 +74,56 @@ App.user_info_initialize();
 AppNotifier.alert("<%= t ".login_success" %>");
 ```
 
-Такой вариант решения задачи довольно распространен и используется во многих проектах.
+This technique is commonly used in a lot of projects.
 
-Однако многие могут заметить, что мы начали писать код стороны клиента на стороне сервера.
+However we understand that we'd started writing client-side code on the server side.
 
-Подобный подход грозит нам тем, что скоро наш JavaScript + JQuery код займет в шаблонах на сервере довольно много места, хотя он должен быть сосредоточен только одном месте - **app/assets/javascript**.
 
-Кроме того, есть вероятность, что шаблон может вам прийти к вам на поддержку и в таком виде:
+Such approach will lead us to Javascript & JQuery code taking up a lot of space in server templates while it has to be concentrated in **app/assets/javascript**.
+
+And there is a possibility that you'd find yourself supporting a code like that one:
 
 ```erb
-$("#sidebar").append("<%= render partial: "user_accaunt_block" %>"); AppNotifier.alert("<%= t ".login_success" %>");
+$("#sidebar").append("<%= render partial: "shopping_cart_block" %>"); AppNotifier.alert("<%= t ".login_success" %>");
 App.sidebar_initialize(); $("#login_block").empty().append("<%= render partial: "user_info" %>");
 App.user_info_initialize();
 ```
 
-Этот код я оставлю без комментариев.
+I leave it uncommented. Yeah.
 
-### Вариант 2 - JODY
+### Variant "B" - JODY
 
-Для решения подобных задач мы предлагаем использовать технику, которая в своей основе использует ряд соглашений и 2 следующих шага:
+We recommend the following technique for implementing solutions for tasks like that. It is based on several conventions and includes 2 parts:
 
-1. Фрагменты вида формируются на стороне сервера и передаются на сторону клиента в виде структурированных JSON данных
-2. JS обработчик (посредник, медиатор), который контролирует поступающие с сервера JSON данные берет на себя большинство рутинных операций с контентом
+1. Partials are built on the server-side and transferred to the client-side as structured JSON
+2. Global JS-handler (Mediator) which controls incoming JSON and executes routine operations with content
 
-Данную технику мы назвали JODY
+We call it JODY
 
-**Основными элементами в технике JODY являются**
+**JODY includes**
 
-1. JS посредник между серверной и клиентской стороной
-2. Средство формирования JSON структур
-3. Ряд соглашений по формированию JSON ответов
+1. JS-mediator for client to server communication/interaction
+2. Builder of JSON (we use JBuilder)
+3. Conventions for JSON building on server side
 
-**JODY позволяет нам**
+**JODY helps**
 
-1. НЕ писать JS код на стороне сервера и НЕ засорять им вьюшки
-2. НЕ контролировать бОльшую часть рутинных операций с пришедшим от сервера контентом (замена, добавление, инициализация обработчиков)
+1. Remove server-side JS code, which pollutes view templates
+2. Reduce code which provide control over majority of  operations with content received from server: replacing it, adding new parts, invoking initializing methods
 
-**JODY позволяет нам**
+**JODY gives**
 
-1. Обеспечить концентрацию JS кода в каталоге **app/assets/javascript**
-2. Оградить backend разработчиков от написания JS кода
-3. Сократить время на реализацию многих задач, связанных с динамической загрузкой контента на страницу
-4. Повысить надежность системы
-5. Сократить количество JS кода и облегчить поддержку
-
-Ниже мы рассмотрим пример реализации JODY
+1. Concentration of JS in **app/assets/javascript** folder
+2. Salvation from writing JS for back-end developers
+3. Reduced time on tasks regarding dynamic page content
+4. High system reliability
+5. Reduced JS code and easier support
 
 ### JODY Mediator
 
-Говоря о посреднике между серверной частью и клиентом я говорю о файле где выполняется определение глобальной реакции на AJAX ответы:
+We define mediator of client to server interaction as a file where we have few handlers for global reaction to AJAX responses:
 
-Это может выглядеть примерно так:
+And it looks like that:
 
 **JODY.js.coffee**
 ```coffeescript
@@ -154,20 +157,19 @@ $(document).ajaxSuccess (event, xhr, params, data) ->
   Redirect.to url
 ```
 
-Идея заключается в том, что пропуская через себя структурированные ответы и используя ряд соглашений, глобальный обработчик AJAX ответов может избавить разработчиков от написания огромного количества рутинного кода.
+The idea is that global handler of AJAX responses works with structured responses and relieves developers of writing redundant code.
 
-Представьте сколько времени можно сэкономить если писать JS код только для того, что бы **показать уведомление**, **вставить полученный HTML в DOM**, **выполнить функции инициализации HTML**.
+Can you imagine how much time can you save if you write JS only to **show notification**, **insert obtained HTML into DOM**, **execute HTML initialization**?
 
-Уникальную логику обработки AJAX запросов вы все так же сможете реализовать с помощью добавления обработчиков на конкретные элементы
+You can still use unique logic for handling AJAX requests implementing with hendlers to specific elements.
 
-я говорю о чем-то таком:
+Something like that for instance:
 
 ```coffeescript
 $('#login_form').on 'ajax:success', (data, status, xhr) ->
   if data.resourse.id is 10000
     alert "Wow! You are user № 10.000!"
 ```
-
 
 ### JBuilder for JODY
 
