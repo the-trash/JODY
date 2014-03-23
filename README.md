@@ -1,5 +1,7 @@
 ## JODY - JsOn for DYnamic sites
 
+JODY is a technique which uses JSON and conventions to simplify development of sites with dynamic content
+<hr>
 Many web applications work perfectly well rendering static pages the traditional way. Its principles are quite simple:
 
 
