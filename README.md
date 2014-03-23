@@ -294,6 +294,10 @@ Please, let me know about your opinion or practice
 
 :octocat: &nbsp; [DISCUSSION ABOUT JODY](https://github.com/the-teacher/JODY/issues/1)
 
+### For contributors
+
+I will be glad to get your translations of this text for your language. Thank you!
+
 #### Acknowledgements
 
 [@milushov](https://github.com/milushov) - Thanks to Roman, whose code helped finally formulating the idea
