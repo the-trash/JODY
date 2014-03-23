@@ -1,7 +1,5 @@
 ## JODY - JsOn for DYnamic sites
 
-Многие web приложения отлично работают с традиционным способом формирования статичных страниц. Суть этого простого процесса заключается в следующем:
-
 Many web applications work perfectly well rendering static pages the traditional way. Its principles are quite simple:
 
 
